@@ -5,11 +5,11 @@
 import unittest
 try:
     from urlparse import urlparse, parse_qs
+    from mock import Mock
 except ImportError:  # pragma: no cover
     # For older versions of Python.
-    from urlparse import urlparse
-    from cgi import parse_qs
-from mock import Mock
+    from urllib.parse import urlparse, parse_qs
+    from unittest.mock import Mock
 from rottentomatoes import rottentomatoes
 from rottentomatoes import RT
 
@@ -67,27 +67,29 @@ class SearchMethodTest(unittest.TestCase):
     def test_empty_search_url_keys(self):
         RT().search('')
         movie = call_args()
-        self.assertEqual(movie.keys(), ['apikey'])
+        self.assertIn('apikey', movie.keys())
 
     def test_nonempty_search_url_keys(self):
         RT().search('some movie')
         movie = call_args()
-        self.assertEqual(movie.keys(), ['q', 'apikey'])
+        self.assertIn('q', movie.keys())
+        self.assertIn('apikey', movie.keys())
 
     def test_search_url_keys_with_page_arg(self):
         RT().search('some movie', page=2)
         movie = call_args()
-        self.assertEqual(movie.keys(), ['q', 'apikey', 'page'])
+        for k in ['q', 'apikey', 'page']:
+            self.assertIn(k, movie.keys())
 
     def test_search_url_keys_with_page_limit_arg(self):
         RT().search('some movie', page_limit=5)
         movie = call_args()
-        self.assertEqual(movie.keys(), ['q', 'apikey', 'page_limit'])
+        self.assertEqual(movie.keys(), {'q', 'apikey', 'page_limit'})
 
     def test_search_url_keys_with_multiple_kwargs(self):
         RT().search('some movie', page=2, page_limit=5)
         movie = call_args()
-        self.assertEqual(movie.keys(), ['q', 'apikey', 'page', 'page_limit'])
+        self.assertEqual(movie.keys(), {'q', 'apikey', 'page', 'page_limit'})
 
     def test_search_url_keys_for_lion_king(self):
         RT().search('the lion king')
