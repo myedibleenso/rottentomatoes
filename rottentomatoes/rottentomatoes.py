@@ -6,12 +6,6 @@ Rotten Tomatoes API:  http://developer.rottentomatoes.com/
 Main file for interacting with the Rotten Tomatoes API.
 """
 
-try:
-    # python 2.7
-    from urllib import urlencode
-except:
-    # python 3.x
-    from urllib.parse import urlencode
 import zlib
 import os
 
@@ -23,9 +17,11 @@ except ImportError:  # pragma: no cover
 
 try:
     from urllib2 import urlopen
+    from urllib import urlencode
 except ImportError:  # pragma: no cover
     # For Python 3.
     from urllib.request import urlopen
+    from urllib.parse import urlencode
 
 
 API_KEY = os.environ.get('RT_KEY')
@@ -74,7 +70,7 @@ class RT(object):
         # if there's an error, it's probably not gzip'd
         pass
 
-      return json.loads(response)
+      return json.loads(response.decode('utf-8'))
 
     def search(self, query, datatype='movies', **kwargs):
         """

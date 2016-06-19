@@ -5,7 +5,7 @@
 import unittest
 try:
     from urlparse import urlparse, parse_qs
-    from mock import Mock
+    from mock.mock import Mock
 except ImportError:  # pragma: no cover
     # For older versions of Python.
     from urllib.parse import urlparse, parse_qs
@@ -84,12 +84,14 @@ class SearchMethodTest(unittest.TestCase):
     def test_search_url_keys_with_page_limit_arg(self):
         RT().search('some movie', page_limit=5)
         movie = call_args()
-        self.assertEqual(movie.keys(), {'q', 'apikey', 'page_limit'})
+        for k in ['q', 'apikey', 'page_limit']:
+            self.assertIn(k, movie.keys())
 
     def test_search_url_keys_with_multiple_kwargs(self):
         RT().search('some movie', page=2, page_limit=5)
         movie = call_args()
-        self.assertEqual(movie.keys(), {'q', 'apikey', 'page', 'page_limit'})
+        for k in ['q', 'apikey', 'page', 'page_limit']:
+            self.assertIn(k, movie.keys())
 
     def test_search_url_keys_for_lion_king(self):
         RT().search('the lion king')
